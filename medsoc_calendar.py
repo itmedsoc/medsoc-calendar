@@ -285,6 +285,8 @@ def parse_rows(rows: list[list[str]]) -> list[dict]:
         # Detect date header row: any cell matching DD/MM
         date_cells = [DATE_HEADER_RE.match(str(c).strip()) for c in row[:7]]
         if any(date_cells):
+            # Reset all dates first, then set only the columns that have DD/MM
+            week_dates = {i: None for i in range(7)}
             for col_idx, cell in enumerate(row[:7]):
                 cell = str(cell).strip()
                 if DATE_HEADER_RE.match(cell):
@@ -293,8 +295,6 @@ def parse_rows(rows: list[list[str]]) -> list[dict]:
                         week_dates[col_idx] = date(YEAR, month, day)
                     except ValueError:
                         week_dates[col_idx] = None
-                else:
-                    week_dates[col_idx] = None
             continue
 
         # Event row — scan each column
